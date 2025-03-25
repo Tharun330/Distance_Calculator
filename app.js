@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const History = require('./models/history')
 const cors = require('cors');
 const bodyParser = require('body-parser')
+const axios = require('axios');
+const getGeocode = require('./geoCode');
+const haversine = require('haversine');
 
 const MONGO_URL = 'mongodb://localhost:27017/distancecalculator';
 
@@ -42,15 +45,79 @@ app.get('/history', async (req, res) => {
 })
 
 app.post('/history/new', async (req, res) => {
+    
 
-    let newHistory = new History(req.body);
-    console.log(`Data Received from client-side: ${newHistory}`);
-    await newHistory.save();
+    try {
+        console.log(req.body?`Data Received from client-side`: `Error while retrieveing data from client-side`);
+        const { sourceAddress, destinationAddress } = req.body;
+        console.log(sourceAddress,destinationAddress);
+
+        if (!sourceAddress || !destinationAddress) {
+            return res.status(400).json({ error: "Both addresses are required" });
+        }
+
+        // Get coordinates for both addresses
+        const location1 = await getGeocode(sourceAddress);
+        const location2 = await getGeocode(destinationAddress);
+
+        // Calculate distance using Haversine formula
+        const distanceKilometers = haversine(location1, location2, { unit: 'km' });
+        const distanceMiles = haversine(location1, location2, { unit: 'mile' });
+
+        console.log(`DisMiles: ${distanceMiles}`);
+        console.log(`DisKilo: ${distanceKilometers}`);
+
+        let newHistory = new History({
+            sourceAddress : req.body.sourceAddress,
+            destinationAddress : req.body.destinationAddress,
+            distanceInMiles : distanceMiles,
+            distanceInKilometers :distanceKilometers
+        });
+        
+        await newHistory.save();
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+   
+   
     res.json({
         message: 'Form Data received'
     })
 
 })
+
+
+
+
+
+
+// app.post('/geocodes',async(req,res) =>{
+//     try {
+//         const { address1, address2 } = req.body;
+
+//         if (!address1 || !address2) {
+//             return res.status(400).json({ error: "Both addresses are required" });
+//         }
+
+//         // Get coordinates for both addresses
+//         const location1 = await getGeocode(address1);
+//         const location2 = await getGeocode(address2);
+
+//         // Calculate distance using Haversine formula
+//         const distance = haversine(location1, location2, { unit: 'km' });
+
+//         res.json({
+//             address1: location1,
+//             address2: location2,
+//             distance_km: distance.toFixed(2)
+//         });
+
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+
+// });
 
 
 app.listen(8080, () => {

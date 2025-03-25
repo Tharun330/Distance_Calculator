@@ -14,13 +14,13 @@ const historySchema = new Schema({
 
     },
     distanceInMiles: {
-        type: Number,
-        required: true
+        type: Number, 
+        set: (val) => parseFloat(val.toFixed(2))   
 
     },
     distanceInKilometers: {
         type: Number,
-        required: true
+        set: (val) => parseFloat(val.toFixed(2)) 
 
     },
 

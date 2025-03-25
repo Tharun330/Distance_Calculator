@@ -9,9 +9,11 @@
   "author": "Tharun Gudla",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.8.4",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "haversine": "^1.1.1",
     "mongoose": "^8.13.0",
     "nodemon": "^3.1.9"
   }
