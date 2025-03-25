@@ -101,6 +101,18 @@ app.post('/history/new', async (req, res) => {
 
 })
 
+//Handling error for unknow path
+app.use('/*', (req, res, next) => {
+   console.log("Route not found! Enter Valid url");
+    res.status(404).json({ error: "Route not found" });
+});
+
+//Error Handling Middleware
+app.use((err, req, res, next) => {
+    console.error("Error:", err.message);
+    next(err);
+});
+
 
 app.listen(8080, () => {
     console.log('Server is listening at port 8080');
