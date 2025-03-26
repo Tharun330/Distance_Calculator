@@ -66,7 +66,7 @@ app.post('/history/new', async (req, res) => {
         console.log(sourceAddress, destinationAddress);
 
         if (!sourceAddress || !destinationAddress) {
-            console.log('Both addresses are reqired');
+            console.log('Both addresses are required');
             return res.status(400).json({ error: "Both addresses are required" });
         }
 
