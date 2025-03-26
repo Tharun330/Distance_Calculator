@@ -102,7 +102,7 @@ app.post('/history/new', async (req, res) => {
 
 })
 
-//Handling error for unknow path
+//Handling error for unknown path
 app.use('/*', (req, res, next) => {
    console.log("Route not found! Enter Valid url");
     res.status(404).json({ error: "Route not found" });
