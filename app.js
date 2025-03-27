@@ -22,10 +22,8 @@ async function main() {
     await mongoose.connect(MONGO_URL);
 }
 
-app.use(cors({
-    origin: 'fsefsfefs',
-    credentials: true
-}));
+app.use(cors());
+app.use(express.json())
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -89,8 +87,10 @@ app.post('/history/new', async (req, res) => {
         });
         await newHistory.save();
 
+         
         res.json({
-            message: 'Form Data received'
+            distanceInMiles: parseFloat(distanceMiles.toFixed(2)),
+            distanceInKilometers:parseFloat(distanceKilometers.toFixed(2))
         })
 
     } catch (err) {
