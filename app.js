@@ -4,11 +4,12 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser')
 
+const port = process.env.PORT || 8080;
 //Requiring url routes from route.js
 const route = require('./routes/route.js')
 
 //MongoDb URL
-const MONGO_URL = 'mongodb://localhost:27017/distancecalculator';
+const MONGO_URL = process.env.DB_URI;
 
 //Calling method for DB connection
 main()
@@ -49,6 +50,6 @@ app.use((err, req, res, next) => {
 });
 
 //Brining Server to live state
-app.listen(8080, () => {
+app.listen(port, () => {
     console.log('Server is listening at port 8080');
 })
