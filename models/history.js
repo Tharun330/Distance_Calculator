@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+//Schema for storing queries history
 const historySchema = new Schema({
 
     sourceAddress: {

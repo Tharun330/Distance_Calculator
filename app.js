@@ -1,15 +1,16 @@
 const express = require("express");
 const app = express();
 const mongoose = require('mongoose');
-const History = require('./models/history')
 const cors = require('cors');
 const bodyParser = require('body-parser')
-const getGeocode = require('./geoCode');
-const haversine = require('haversine');
 
+//Requiring url routes from route.js
+const route = require('./routes/route.js')
 
+//MongoDb URL
 const MONGO_URL = 'mongodb://localhost:27017/distancecalculator';
 
+//Calling method for DB connection
 main()
     .then(() => {
         console.log('connected to DB');
@@ -18,95 +19,28 @@ main()
         console.log(err);
     })
 
+//Method containing DB connection
 async function main() {
     await mongoose.connect(MONGO_URL);
 }
 
-app.use(cors({
-    origin: 'fsefsfefs',
-    credentials: true
-}));
+//For cross origin requesting for accepting data from FrontEnd
+app.use(cors());
+app.use(express.json())
 
+//To access the data in JSON form & data from URL parameters
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
 
 
-//Basic Logging 
+//Middleware for Basic Logging 
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 });
 
-
-app.get('/history', async (req, res) => {
-
-    try {
-
-        let data = await History.find({})
-        console.log(`Data from DB: ${data ? 'data retrieved from DB successful' : 'Error in retriev data from db'}`)
-        res.send(data);
-
-    } catch (err) {
-
-        console.log(err.message);
-        res.json({
-            error: err.message
-        })
-    }
-
-
-})
-
-app.post('/history/new', async (req, res) => {
-
-
-    try {
-        console.log(req.body ? `Data Received from client-side` : `Error while retrieveing data from client-side`);
-        const { sourceAddress, destinationAddress } = req.body;
-        console.log(sourceAddress, destinationAddress);
-
-        if (!sourceAddress || sourceAddress.length < 5 || !destinationAddress || destinationAddress.length < 5) {
-            console.log('Both addresses are required');
-            return res.status(400).json({ error: "Both addresses are required" });
-        }
-
-        // Get coordinates for both addresses
-        const location1 = await getGeocode(sourceAddress);
-        const location2 = await getGeocode(destinationAddress);
-
-        // Calculate distance using Haversine formula
-        const distanceKilometers = haversine(location1, location2, { unit: 'km' });
-        const distanceMiles = haversine(location1, location2, { unit: 'mile' });
-
-        console.log(`DisMiles: ${distanceMiles}`);
-        console.log(`DisKilo: ${distanceKilometers}`);
-
-        let newHistory = new History({
-            sourceAddress: req.body.sourceAddress,
-            destinationAddress: req.body.destinationAddress,
-            distanceInMiles: distanceMiles,
-            distanceInKilometers: distanceKilometers
-        });
-        await newHistory.save();
-
-        res.json({
-            message: 'Form Data received'
-        })
-
-    } catch (err) {
-
-        res.json({
-            error: err.message
-        })
-    }
-
-})
-
-//Handling error for unknown path
-app.use('/*', (req, res, next) => {
-   console.log("Route not found! Enter Valid url");
-    res.status(404).json({ error: "Route not found" });
-});
+//Main Routes
+app.use('/', route);
 
 //Error Handling Middleware
 app.use((err, req, res, next) => {
@@ -114,7 +48,7 @@ app.use((err, req, res, next) => {
     next(err);
 });
 
-
+//Brining Server to live state
 app.listen(8080, () => {
     console.log('Server is listening at port 8080');
 })
