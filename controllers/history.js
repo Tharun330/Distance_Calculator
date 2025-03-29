@@ -2,7 +2,7 @@ const getGeocode = require('../geoCode');
 const haversine = require('haversine');
 const History = require('../models/history')
 
-
+//Controller for retrieving from DB
 module.exports.getHistory = async (req, res) => {
 
     try {
@@ -22,6 +22,7 @@ module.exports.getHistory = async (req, res) => {
 
 }
 
+//Controller for post search queries into the DB
 module.exports.postQuery = async (req, res) => {
 
 
@@ -69,6 +70,7 @@ module.exports.postQuery = async (req, res) => {
 
 }
 
+//Controller for Unknown route
 module.exports.unknownRoute = (req, res, next) => {
     console.log("Route not found! Enter Valid url");
     res.status(404).json({ error: "Route not found" });
