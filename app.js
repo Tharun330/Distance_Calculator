@@ -9,7 +9,7 @@ const port = process.env.PORT || 8080;
 const route = require('./routes/route.js')
 
 //MongoDb URL
-const MONGO_URL = process.env.DB_URI;
+const MONGO_URL = process.env.DB_URI || 'mongodb://localhost:27017/distancecalculator';
 
 //Calling method for DB connection
 main()
